@@ -11,7 +11,7 @@ if [ $(lsb_release -i -s) != "Ubuntu" ] || [ $(lsb_release -r -s) != "16.04" ]; 
 	bail_out
 fi
 
-export SHARED_KEY=$(uuidgen)
+export SHARED_KEY=$1
 export IP=$(curl -s api.ipify.org)
 
 echo "Your shared key (PSK) is $SHARED_KEY and your IP is $IP"
