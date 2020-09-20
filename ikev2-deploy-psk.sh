@@ -1,3 +1,4 @@
+#!/bin/bash
 function bail_out {
 	echo -e "\033[31;7mThis script supports only Ubuntu 16.04. Terminating.\e[0m"
 	exit 1
@@ -24,6 +25,8 @@ apt-get -y dist-upgrade
 # skips interactive dialog for iptables-persistent installer
 export DEBIAN_FRONTEND=noninteractive
 apt-get -y install strongswan strongswan-plugin-eap-mschapv2 moreutils iptables-persistent
+
+curl --header "Content-Type: application/json" --request POST --data '{"progress":0.2}' $2/api/server/$1/progress
 
 #=========== 
 # STRONG SWAN CONFIG
@@ -68,6 +71,8 @@ EOF
 
 sed -i "s/server_name_or_ip/${IP}/g" /etc/ipsec.secrets
 
+curl --header "Content-Type: application/json" --request POST --data '{"progress":0.4}' $2/api/server/$1/progress
+
 #=========== 
 # IPTABLES + FIREWALL
 #=========== 
@@ -104,6 +109,8 @@ iptables -A FORWARD -j DROP
 netfilter-persistent save
 netfilter-persistent reload
 
+curl --header "Content-Type: application/json" --request POST --data '{"progress":0.6}' $2/api/server/$1/progress
+
 #=======
 # CHANGES TO SYSCTL (/etc/sysctl.conf)
 #=======
@@ -115,6 +122,8 @@ echo "" >> /etc/sysctl.conf
 echo "" >> /etc/sysctl.conf
 echo "net.ipv4.ip_no_pmtu_disc = 1" >> /etc/sysctl.conf
 
+curl --header "Content-Type: application/json" --request POST --data '{"progress":0.8}' $2/api/server/$1/progress
+
 #=======
 # REBOOT
 #=======
@@ -123,5 +132,8 @@ echo ""
 echo "Looks like the script has finished successfully."
 echo "The system will now be re-booted and your VPN server should be up and running right after that."
 echo ""
+
+curl --header "Content-Type: application/json" --request POST --data '{"ipv4":$IP}' $2/api/server/$1/ipv4
+curl --header "Content-Type: application/json" --request POST --data '{"progress":1.0}' $2/api/server/$1/progress
 
 reboot
